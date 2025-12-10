@@ -1,29 +1,66 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
-class HomeScreenFoodOrder extends StatelessWidget {
+class HomeScreenFoodOrder extends StatefulWidget {
   const HomeScreenFoodOrder({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    List<String> itemImages = [
-      "assets/images/Group 33655.png",
-      "assets/images/Group 33654.png",
-      "assets/images/Group 33652.png",
-      "assets/images/Group 33653.png",
-    ];
-    List<Color> itemColors = [
-      Colors.white,
-      Colors.white,
-      Colors.greenAccent,
-      Colors.white,
-    ];
-    List<String> mealImages = [
-      "assets/images/borger1.png",
-      "assets/images/burger2.jpeg",
-      "assets/images/burger3.png",
-      "assets/images/burger4.jpg",
-    ];
+  State<HomeScreenFoodOrder> createState() => _HomeScreenFoodOrderState();
+}
 
+class _HomeScreenFoodOrderState extends State<HomeScreenFoodOrder> {
+  final ScrollController _scrollController = ScrollController();
+  double scrollPosition = 0.0;
+  late Timer _timer;
+
+  List<String> itemImages = [
+    "assets/images/Group 33655.png",
+    "assets/images/Group 33654.png",
+    "assets/images/Group 33652.png",
+    "assets/images/Group 33653.png",
+  ];
+
+  List<Color> itemColors = [
+    Colors.grey,
+    Colors.grey,
+    Colors.greenAccent,
+    Colors.grey,
+  ];
+
+  List<String> mealImages = [
+    "assets/images/borger1.png",
+    "assets/images/burger2.jpeg",
+    "assets/images/burger3.png",
+    "assets/images/burger4.jpg",
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      if (_scrollController.hasClients) {
+        scrollPosition += 2;
+        if (scrollPosition >= _scrollController.position.maxScrollExtent) {
+          scrollPosition = 0;
+        }
+        _scrollController.animateTo(
+          scrollPosition,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.linear,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -48,7 +85,7 @@ class HomeScreenFoodOrder extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Your Location", style: TextStyle(fontSize: 14)),
-                            Text("Savar, Dhaka", style: TextStyle(fontSize: 14)),
+                            Text("Cairo", style: TextStyle(fontSize: 14)),
                           ],
                         ),
                       ],
@@ -59,7 +96,6 @@ class HomeScreenFoodOrder extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
                 TextField(
                   style: const TextStyle(color: Colors.white),
@@ -76,13 +112,12 @@ class HomeScreenFoodOrder extends StatelessWidget {
                     prefixIcon: const Icon(Icons.search, color: Colors.white),
                   ),
                 ),
-
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(4, (index) {
                     return Container(
-                      width: (MediaQuery.of(context).size.width - 60) / 4,
+                      width: 86,
                       height: 100,
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -91,25 +126,20 @@ class HomeScreenFoodOrder extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(itemImages[index], fit: BoxFit.contain),
+                        child:
+                        Image.asset(itemImages[index], fit: BoxFit.contain),
                       ),
                     );
                   }),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  "Meals",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: mealImages.map((imgPath) {
+                SizedBox(
+                  height: 120,
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: mealImages.length,
+                    itemBuilder: (context, index) {
                       return Container(
                         margin: const EdgeInsets.only(right: 12),
                         width: 120,
@@ -122,20 +152,86 @@ class HomeScreenFoodOrder extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.asset(
-                            imgPath,
+                            mealImages[index],
                             fit: BoxFit.cover,
                           ),
                         ),
                       );
-                    }).toList(),
+                    },
                   ),
                 ),
-
                 const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Text(
+                      "Popular Items",
+                      style:
+                      TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "View All",
+                      style: TextStyle(fontSize: 18, color: Colors.blue),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: (MediaQuery.of(context).size.width / 2) - 18,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        image: const DecorationImage(
+                          image: AssetImage("assets/images/download.jpeg"),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: (MediaQuery.of(context).size.width / 2) - 18,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        image: const DecorationImage(
+                          image: AssetImage("assets/images/download (1).jpeg"),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 100),
               ],
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag),
+            label: "Orders",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inbox),
+            label: "Inbox",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Profile",
+          ),
+        ],
       ),
     );
   }
